@@ -29,7 +29,3 @@ def is_compressed(data: bytes) -> bool:
         if unpack("i", data[:4])[0] is 100:
             return True
     return False
-
-
-def message(msg: str) -> None:
-    print(f"[lz4unipy] {msg}")

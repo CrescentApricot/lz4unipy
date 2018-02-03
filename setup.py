@@ -10,8 +10,8 @@ with open('LICENSE') as f:
 
 setup(
     name='lz4unipy',
-    version='0.0.1',
-    description='unity3d compatible lz4 pack/unpack library in Python3.',
+    version='1.0.0',
+    description='unity3d compatible lz4 pack/unpack library working on Python3.',
     long_description=readme,
     author='Cryptomelone',
     author_email='cryptomelone@users.noreply.github.com',
