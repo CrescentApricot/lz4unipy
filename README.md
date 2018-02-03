@@ -9,7 +9,7 @@ It contains functions and simple command line tools for make/pack unity3d compat
 ## Install
 
 ```bash
-pip3 install git+ssh://git@github.com/Cryptomelone/lz4unipy.git
+pip3 install lz4unipy
 ```
 
 ## Usage
