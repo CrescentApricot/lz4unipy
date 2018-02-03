@@ -3,8 +3,8 @@ unity3d compatible lz4 pack/unpack library in Python3.
 
 ## About
 
-lz4unipyはPython3で動作するunity3d互換の圧縮/展開ライブラリです。<br>
-unity3d互換のlz4ファイルを作ったり圧縮するための関数や簡単なコマンドラインツールを内包しています。<br>
+lz4unipy is unity3d compatible lz4 pack/unpack library working on Python3.<br>
+It contains functions and simple command line tools for make/pack unity3d compatibled lz4 file.  
 
 ## Install
 

@@ -105,4 +105,6 @@ venv.bak/
 # mypy
 .mypy_cache/
 
+.pypirc
+
 tests/sample.png.lz4
