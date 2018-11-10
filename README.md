@@ -30,7 +30,7 @@ with open("target_file.unity3d.lz4", "rb") as f:
     if lz4unipy.is_compressed(data):
         with open("target_file.unity3d", "wb") as w:
             w.write(lz4unipy.decompress(data))
-            
+
 with open("target_file.unity3d", "rb") as f:
     data = f.read()
     if not lz4unipy.is_compressed(data):
@@ -41,7 +41,7 @@ with open("target_file.unity3d", "rb") as f:
 ## Test
 
 ```bash
-git clone git@github.com/Cryptomelone/lz4unipy.git
+git clone git@github.com/CrescentApricot/lz4unipy.git
 cd lz4unipy
 pip3 install -r requirements.txt
 python3 setup.py test
