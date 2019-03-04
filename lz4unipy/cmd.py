@@ -1,73 +1,78 @@
-import sys
-import os
+import pathlib
+import argparse
+import traceback
 from . import handler
 
 
+prefix = "[lz4unipy]"
+
+
 def main():
-    if len(sys.argv) <= 2:
-        __message("Please specify file.\nUsage: lz4unipy [pack|unpack] target_file [target dir]")
-    elif 3 <= len(sys.argv) <= 4:
-        if len(sys.argv) is 4:
-            if not os.path.exists(sys.argv[3]):
-                __message(f"Target directory did not exist: {sys.argv[2]}")
-                return False
-            save_dir = sys.argv[3]
-            __message(f"Target directory:: {save_dir}")
-        else:
-            __message("Target directory does not specified. Output to current directory.")
-            save_dir = ""
-
-        file_path = sys.argv[2]
-
-        if not os.path.exists(file_path):
-            __message(f"入力ファイルが存在しませんでした: {file_path}")
-            return False
-
-        spl = file_path.split(".")
-
-        set_mode = sys.argv[1]
-        if set_mode == "pack":  # pack
-            __message("Starting pack.")
-            export_path = file_path + ".lz4"
-
-            with open(file_path, "rb") as f:
-                data = f.read()
-                if handler.is_compressed(data):
-                    __message("This file is already may be compressed with unity3d compatible lz4. pack aborted.")
-                    return False
+    parser = argparse.ArgumentParser()
+    parser.add_argument("infile", nargs="+", help="ファイルを指定します（複数可）。")
+    parser.add_argument("--dir", required=False, default=False, help="結果の出力先ディレクトリを指定します。")
+    args = parser.parse_args()
+    current_dir = pathlib.Path().parent
+    if args.dir:
+        save_dir = pathlib.Path(args.dir)
+        if not save_dir.is_dir():
+            i = input(f"{prefix} 指定されたディレクトリが見つかりませんでした。カレントディレクトリ({current_dir.absolute()})を出力先ディレクトリとして使用します。よろしいですか？[Y/n]: ")
+            while True:
+                if "y" in i.lower():
+                    save_dir = current_dir
+                    break
+                elif "n" in i.lower():
+                    print(f"{prefix} 処理を中断します。")
+                    exit()
                 else:
-                    if os.path.exists(os.path.join(save_dir, export_path)):
-                        __message(f"A file with the same name as the file scheduled to be output already exists: {export_path}\npack aborted.")
-                        return False
-                    with open(os.path.join(save_dir, export_path), "wb") as w:
-                        w.write(handler.compress(data))
-                    __message(f"Pack completed: {export_path}")
-        elif set_mode == "unpack":  # unpack
-            __message("Staring unpack.")
-            if len(spl) is 1:
-                export_path = file_path + ".dat"
-            else:
-                if spl[-1] == "lz4":
-                    export_path = file_path[:-4]
+                    i = input(f"{prefix} Y/nで入力してください。")
+                    continue
+    else:
+        save_dir = current_dir
+    print(f"{prefix} 出力先フォルダ: {save_dir.absolute()}")
+
+    for filename in args.infile:
+        file = pathlib.Path(filename)
+        if file.is_file():
+            print(f"{prefix} ファイル、 {file.absolute()} の処理を開始します。")
+            with open(file, "rb") as f:
+                binary = f.read()
+                if handler.is_compressed(binary):
+                    print(f"{prefix} このファイルはunitylz4形式で圧縮されています。展開を試みます。")
+                    if file.suffix == ".lz4":
+                        output = save_dir / file.stem
+                    else:
+                        output = save_dir / (file.name + ".dat")
+                    while True:
+                        if output.is_file():
+                            output = save_dir / (output.name + ".dat")
+                            continue
+                        else:
+                            break
+                    print(f"{prefix} 出力先: {output.absolute()}")
+                    try:
+                        dec = handler.decompress(binary)
+                        with open(output, "wb") as w:
+                            w.write(dec)
+                        print(f"{prefix} 展開に成功しました。")
+                    except Exception as _:
+                        print(f"{prefix} 展開に失敗しました。")
+                        traceback.print_exc()
                 else:
-                    export_path = file_path + ".dat"
-
-            with open(file_path, "rb") as f:
-                data = f.read()
-                if handler.is_compressed(data):
-                    if os.path.exists(os.path.join(save_dir, export_path)):
-                        __message(f"A file with the same name as the file scheduled to be output already exists: {export_path}\nunpack aborted.")
-                        return False
-                    with open(os.path.join(save_dir, export_path), "wb") as w:
-                        w.write(handler.decompress(data))
-                    __message(f"Unpack completed: {export_path}")
-                else:
-                    __message("This file is not may be compressed with unity3d compatible lz4. unpack aborted.")
-                    return False
-        else:
-            __message("Specified mode was invalid. please spec `pack` or `unpack`.")
-            return False
-
-
-def __message(msg: str):
-    print(f"[lz4unipy] {msg}")
+                    print(f"{prefix} このファイルは圧縮されていません。圧縮を試みます。")
+                    output = save_dir / (file.name + ".lz4")
+                    while True:
+                        if output.is_file():
+                            output = save_dir / (output.name + ".lz4")
+                            continue
+                        else:
+                            break
+                    print(f"{prefix} 出力先: {output.absolute()}")
+                    try:
+                        com = handler.compress(binary)
+                        with open(output, "wb") as w:
+                            w.write(com)
+                        print(f"{prefix} 圧縮に成功しました。")
+                    except Exception as _:
+                        print(f"{prefix} 圧縮に失敗しました。")
+                        traceback.print_exc()

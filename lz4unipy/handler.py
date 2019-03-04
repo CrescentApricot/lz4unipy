@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import lz4
+import lz4.block
 from io import BytesIO
 from struct import pack, unpack
 
