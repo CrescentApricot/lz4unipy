@@ -10,7 +10,7 @@ with open('LICENSE') as f:
 
 setup(
     name='lz4unipy',
-    version='2.0.0',
+    version='2.0.1',
     description='unity3d compatible lz4 (un)compress tool working on Python3.',
     long_description=long_description,
     author='CrescentApricot',
